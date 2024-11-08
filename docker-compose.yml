@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: demo
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3313:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - app-network
+
+  singleton:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - DB_TYPE=mysql
+    working_dir: /app/singleton
+    ports:
+      - "8081:8080"
+    command: go run main.go
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+
+volumes:
+  dbdata:
