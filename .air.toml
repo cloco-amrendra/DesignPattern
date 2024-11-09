@@ -1,0 +1,20 @@
+# .air.toml configuration
+
+# Root directory for Air to watch
+root = "."
+tmp_dir = "tmp"
+
+# Build options
+[build]
+cmd = "go build -o ./tmp/main ./singleton/main.go"
+bin = "tmp/main"
+full_bin = "tmp/main"
+exclude_dirs = ["tmp"]
+
+# Run options
+[log]
+level = "debug"
+
+[delay]
+start = 2000 # start after 2000 milliseconds (2 seconds)
+restart = 500 # restart after 500 milliseconds

@@ -21,15 +21,17 @@ services:
       dockerfile: Dockerfile
     environment:
       - DB_TYPE=mysql
-    working_dir: /app/singleton
+    working_dir: /app
+    volumes:
+      - .:/app     # Mount the current directory to /app in the container
+      - /app/tmp    # Optional: Separate tmp folder to prevent caching issues
     ports:
       - "8081:8080"
-    command: go run main.go
+    command: air    # Start the app with Air for live reloading
     depends_on:
       - db
     networks:
       - app-network
-
 
 networks:
   app-network:
