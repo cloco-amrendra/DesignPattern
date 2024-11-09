@@ -1,14 +1,14 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
+	"go-design-patterns/factory/notification"
 	"go-design-patterns/singleton/config"
 	"go-design-patterns/singleton/handler"
 	"go-design-patterns/singleton/logger"
 	"go-design-patterns/singleton/middleware"
 	"go-design-patterns/singleton/repository"
 	"go-design-patterns/singleton/usecase"
-
-	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -24,6 +24,10 @@ func main() {
 	userRepo := repository.NewUserRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	userHandler := handler.NewUserHandler(userUsecase)
+
+	//demonstrate factory pattern
+
+	notificationFactory := &notification.ConcreteNotificationServiceFactory{}
 
 	r := gin.Default()
 
@@ -47,6 +51,15 @@ func main() {
 		protected.POST("/users", func(c *gin.Context) {
 			log.Info("Creating a new user")
 			userHandler.CreateUser(c)
+		})
+
+		// Send notification endpoint to showcase factory pattern
+
+		protected.GET("/send-notification", func(c *gin.Context) {
+			// Get notification type from query parameter (default to "email")
+			notificationType := c.DefaultQuery("type", "email")
+			notificationHandler := handler.NewNotificationHandler(notificationFactory, notificationType)
+			notificationHandler.SendNotification(c)
 		})
 	}
 
