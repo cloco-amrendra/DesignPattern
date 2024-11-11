@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	complexnotification "go-design-patterns/abstract-factory/notification"
 	"go-design-patterns/factory/notification"
 	"go-design-patterns/singleton/config"
 	"go-design-patterns/singleton/handler"
@@ -61,6 +62,32 @@ func main() {
 			notificationHandler := handler.NewNotificationHandler(notificationFactory, notificationType)
 			notificationHandler.SendNotification(c)
 		})
+
+		// Send complex notification endpoint to showcase abstract factory pattern
+
+		protected.GET("/send-complex-notification", func(c *gin.Context) {
+			// Determine the provider based on the query parameter
+			provider := c.DefaultQuery("provider", "SMTP") // Default to SMTP if not provided
+
+			var factory complexnotification.NotificationProviderFactory
+			switch provider {
+			case "SES":
+				factory = &complexnotification.SESFactory{}
+			default:
+				factory = &complexnotification.SMTPFactory{}
+			}
+
+			complexNotificationHandler := handler.NewComplexNotificationHandler(factory)
+
+			// Choose email or SMS based on another query parameter
+			notificationType := c.DefaultQuery("type", "email")
+			if notificationType == "sms" {
+				complexNotificationHandler.SendSMS(c)
+			} else {
+				complexNotificationHandler.SendEmail(c)
+			}
+		})
+
 	}
 
 	log.Info("Server is running on port 8080.")
